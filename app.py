@@ -3,8 +3,7 @@ import pandas as pd
 from datetime import datetime
 from supabase import create_client
 import plotly.express as px
-import logging
-logging.basicConfig(level=logging.INFO)
+
 
 
 
@@ -266,3 +265,4 @@ with tab5:
 
     # ---------------- Footer ----------------
     st.markdown("---")
+
