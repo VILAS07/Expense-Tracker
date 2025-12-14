@@ -7,19 +7,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-st.markdown("""
-<style>
-/* container holding the tabs */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 250px !important;    /* space between tabs */
-}
 
-/* tab text size (optional) */
-.stTabs [data-baseweb="tab"] {
-    font-size: 20px;
-}
-</style>
-""", unsafe_allow_html=True)
 
 SUPABASE_URL = st.secrets["SUPABASE_URL"]
 SUPABASE_KEY = st.secrets["SUPABASE_KEY"]
@@ -31,7 +19,8 @@ st.set_page_config(
     layout="wide"
 )
 
-st.markdown("## 💰 Expense Tracker")
+st.header("💰 Expense Tracker")
+
 st.caption("Track • Analyze • Control your spending")
 st.divider()
 CATEGORIES = [
@@ -146,16 +135,27 @@ def get_expenses_df():
         return df
     return pd.DataFrame()
 
-def update_expense(expense_id, date, category, amount, description, payment):
+def update_expense(expense_id, date=None, category=None, amount=None, description=None, payment=None):
+    update_data = {}
+
+    if date:
+        update_data["Date"] = date.isoformat()
+    if category:
+        update_data["Category"] = category
+    if amount and amount > 0:
+        update_data["Amount"] = amount
+    if description:
+        update_data["Description"] = description
+    if payment:
+        update_data["Payment_Method"] = payment
+
+    if not update_data:
+        st.warning("No fields to update")
+        return
+
     supabase.table("Expence") \
-        .update({
-            "Date": date.isoformat(),
-            "Category": category,
-            "Amount": amount,
-            "Description": description,
-            "Payment_Method": payment
-        }) \
-        .eq("id", expense_id) \
+        .update(update_data) \
+        .eq("Id", expense_id) \
         .execute()
 
     st.success("Expense updated successfully ✨")
@@ -163,13 +163,14 @@ def update_expense(expense_id, date, category, amount, description, payment):
     st.rerun()
 
 
+
 # ---------------- Initialize Data ----------------
 if 'expenses' not in st.session_state:
     fetch_expenses()
 
 df = get_expenses_df()
-tab_add, tab_table, tab_analytics = st.tabs(
-    ["➕ Add", "📋 Transactions", "📊 Insights"]
+tab_add, tab_table,tab_update, tab_analytics = st.tabs(
+    ["➕ Add", "📋 Transactions","✏️Update", "📊 Insights"]
 )
 
 with tab_add:
@@ -203,11 +204,38 @@ with tab_table:
         display_df = df.sort_values("date", ascending=False).head(10)
 
         st.dataframe(
-            display_df[["date", "Category", "Amount", "Payment_Method", "Description"]],
+            display_df[["Id","date", "Category", "Amount", "Payment_Method", "Description"]],
             use_container_width=True,
             hide_index=True
         )
 
+with tab_update:
+    st.header("✏️ Update Data")
+    if df.empty:
+        st.info("No expenses yet. Add your first expense ➕")
+    else:
+        with st.form("Update Form"):
+            expense_id = st.number_input("Expense ID", min_value=1)
+
+            update_date = st.checkbox("Update Date")
+            date = st.date_input("New Date") if update_date else None
+
+            update_category = st.checkbox("Update Category")
+            category = st.selectbox("Category", CATEGORIES) if update_category else None
+
+            update_amount = st.checkbox("Update Amount")
+            amount = st.number_input("Amount", min_value=0.0) if update_amount else None
+
+            update_description = st.checkbox("Update Description")
+            description = st.text_input("Description") if update_description else None
+
+            update_payment = st.checkbox("Update Payment")
+            payment = st.selectbox("Payment Method", PAYMENT_METHODS) if update_payment else None
+
+            submit = st.form_submit_button("✏️ Update")
+
+            if submit:
+                update_expense(expense_id, date, category, amount, description, payment)
 
 with tab_analytics:
     if df.empty:
