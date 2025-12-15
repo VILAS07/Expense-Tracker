@@ -162,15 +162,24 @@ def update_expense(expense_id, date=None, category=None, amount=None, descriptio
     fetch_expenses()
     st.rerun()
 
-
+def delete(ID):
+    ID=int(ID)
+    response=(supabase.table('Expence') \
+        .delete() \
+        .eq('Id',ID)\
+        .execute()
+    )
+    st.success(f'Deleted ID :{ID}  FROM TABLE')
+    fetch_expenses()
+    st.rerun()
 
 # ---------------- Initialize Data ----------------
 if 'expenses' not in st.session_state:
     fetch_expenses()
 
 df = get_expenses_df()
-tab_add, tab_table,tab_update, tab_analytics = st.tabs(
-    ["➕ Add", "📋 Transactions","✏️Update", "📊 Insights"]
+tab_add, tab_table,tab_update,tab_delete, tab_analytics = st.tabs(
+    ["➕ Add", "📋 Transactions","✏️Update",'🗑️Delete️',"📊 Insights"]
 )
 
 with tab_add:
@@ -236,6 +245,16 @@ with tab_update:
 
             if submit:
                 update_expense(expense_id, date, category, amount, description, payment)
+
+with tab_delete:
+    if df.empty:
+        st.info("No data to delete")
+    else:
+        with st.form("Delete Form"):
+            ID=st.number_input('Enter the ID of Column you want to Delete')
+            submit=st.form_submit_button('🗑️ Delete')
+            if submit:
+                delete(ID)
 
 with tab_analytics:
     if df.empty:
@@ -307,6 +326,7 @@ with tab_analytics:
                 markers=True
             )
             st.plotly_chart(fig_line, use_container_width=True)
+
 
 
 
