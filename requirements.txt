@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 streamlit
 pandas
 plotly
 supabase
+=======
+streamlit
+pandas
+plotly
+supabase
+>>>>>>> 322dfbacfb33c061f5a2db72d53f5c7db68c4bbd
