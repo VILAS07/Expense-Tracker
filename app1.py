@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -345,7 +345,7 @@ with tab_analytics:
 
 
 
-=======
+
 import streamlit as st
 import pandas as pd
 from datetime import datetime
@@ -678,4 +678,4 @@ with tab_analytics:
 
 
 
->>>>>>> 322dfbacfb33c061f5a2db72d53f5c7db68c4bbd
+
