@@ -23,7 +23,7 @@ st.set_page_config(
 st.header("💰 Expense Tracker")
 
 st.caption("Track • Analyze • Control your spending")
-st.divider()
+
 CATEGORIES = [
     "Food & Dining", "Transportation", "Shopping", "Entertainment",
     "Bills & Utilities", "Healthcare", "Education", "Travel",
