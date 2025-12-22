@@ -95,6 +95,9 @@ if st.session_state.user is None:
                 st.error("Signup failed.")
 
     st.stop()  # Prevent loading app before login
+    
+st.markdown(f'_Welcome Back {st.session_state.username}_')
+st.divider()
 
 # ---------------- Fetch Expenses ----------------
 def fetch_expenses():
