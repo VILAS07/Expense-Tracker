@@ -108,6 +108,11 @@ def fetch_expenses():
 
     st.session_state.expenses = response.data if response.data else []
 
+def check(id):
+    if id in df['Id'].values:
+        return True
+    else:
+        return False
 
 def add_expense(date, category, amount, description, payment_method):
     """Insert a new expense into Supabase"""
@@ -156,6 +161,9 @@ def update_expense(expense_id, date=None, category=None, amount=None, descriptio
     if not update_data:
         st.warning("No fields to update")
         return
+    if check(expense_id)==False:
+        st.warning("ID doesn't Exist")
+        return
 
     supabase.table("Expence") \
         .update(update_data) \
@@ -167,13 +175,17 @@ def update_expense(expense_id, date=None, category=None, amount=None, descriptio
     st.rerun()
 
 def delete(ID):
-    ID=int(ID)
-    response=(supabase.table('Expence') \
-        .delete() \
-        .eq('Id',ID)\
-        .execute()
-    )
-    st.success(f'Deleted ID :{ID}  FROM TABLE')
+    ID = int(ID)
+    if check(ID)==False:
+        st.warning("ID doesn't Exist")
+        return
+    else:
+        response = (supabase.table('Expence') \
+                    .delete() \
+                    .eq('Id', ID) \
+                    .execute()
+                    )
+        st.success(f'Deleted ID :{ID}  FROM TABLE')
     fetch_expenses()
     st.rerun()
 
